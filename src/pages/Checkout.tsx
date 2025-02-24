@@ -1,12 +1,65 @@
+
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { useCartStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Copy, CheckCircle } from "lucide-react";
+import { ExternalLink, Copy, CheckCircle, Clock, MessageSquare } from "lucide-react";
 import QRCode from "qrcode";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
-const OrderConfirmation = ({ referenceNumber }: { referenceNumber: string }) => {
+const sendTelegramNotification = async (orderDetails: {
+  orderRef: string;
+  telegramUsername?: string;
+  planName: string;
+  amount: number;
+  specs: string;
+}) => {
+  const botToken = '7836067134:AAE769m7j3t1qfe1iuX4m8algUzuCI8iKpQ';
+  const chatId = '1264599494';
+  
+  const message = `
+🔔 *New GeoVFX RDP Order*
+───────────────
+📋 *Order Ref:* ${orderDetails.orderRef}
+👤 *Customer:* ${orderDetails.telegramUsername || 'Not provided'}
+🖥 *Plan:* ${orderDetails.planName}
+💻 *Specs:* ${orderDetails.specs}
+💵 *Amount:* $${orderDetails.amount.toFixed(2)}
+⏱ *Time:* ${new Date().toLocaleString()}
+
+_Customer has submitted payment confirmation._
+  `;
+  
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown',
+      }),
+    });
+    
+    const data = await response.json();
+    console.log('Telegram notification sent:', data);
+    return data.ok;
+  } catch (error) {
+    console.error('Error sending Telegram notification:', error);
+    return false;
+  }
+};
+
+const OrderConfirmation = ({ 
+  referenceNumber,
+  telegramUsername 
+}: { 
+  referenceNumber: string;
+  telegramUsername: string;
+}) => {
   const { toast } = useToast();
   
   const copyReference = () => {
@@ -37,16 +90,35 @@ const OrderConfirmation = ({ referenceNumber }: { referenceNumber: string }) => 
           <li>Copy your reference number</li>
           <li>Contact us on Telegram</li>
           <li>Send payment screenshot and reference</li>
-          <li>Receive your RDP credentials</li>
+          <li>Receive your RDP credentials (estimated delivery: 30 minutes)</li>
         </ol>
       </div>
-      
-      <Button asChild className="w-full">
-        <a href="https://t.me/GeoVFX" target="_blank" rel="noopener noreferrer">
-          Contact on Telegram
-          <ExternalLink className="ml-2 h-4 w-4" />
-        </a>
-      </Button>
+
+      <div className="space-y-4">
+        <Button asChild className="w-full">
+          <a href={`https://t.me/GeoVFX`} target="_blank" rel="noopener noreferrer">
+            Contact on Telegram
+            <ExternalLink className="ml-2 h-4 w-4" />
+          </a>
+        </Button>
+        
+        <Link to="/">
+          <Button variant="outline" className="w-full">
+            Return to Homepage
+          </Button>
+        </Link>
+      </div>
+
+      <div className="mt-8 pt-8 border-t border-border">
+        <div className="flex items-center justify-center gap-2 text-muted-foreground">
+          <Clock className="h-4 w-4" />
+          <span>Estimated delivery time: 30 minutes</span>
+        </div>
+        <div className="flex items-center justify-center gap-2 text-muted-foreground mt-2">
+          <MessageSquare className="h-4 w-4" />
+          <span>Need help? Contact support on Telegram</span>
+        </div>
+      </div>
     </div>
   );
 };
@@ -54,10 +126,15 @@ const OrderConfirmation = ({ referenceNumber }: { referenceNumber: string }) => 
 const Checkout = () => {
   const items = useCartStore(state => state.items);
   const getTotalPrice = useCartStore(state => state.getTotalPrice);
+  const clearCart = useCartStore(state => state.clearCart);
   const [qrCode, setQrCode] = useState<string>("");
   const [referenceNumber, setReferenceNumber] = useState<string>("");
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [total, setTotal] = useState(0);
+  const [telegramUsername, setTelegramUsername] = useState("");
+  const [transactionId, setTransactionId] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const storeTotal = getTotalPrice();
@@ -84,11 +161,55 @@ const Checkout = () => {
     }
   }, [total]);
 
-  const handleProceedToPayment = () => {
-    const ref = `GEO-${Date.now().toString(36).toUpperCase()}`;
+  const handleProceedToPayment = async () => {
+    if (!telegramUsername || !transactionId) {
+      toast({
+        variant: "destructive",
+        description: "Please provide both Telegram username and transaction ID",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    const ref = `GEO-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
     setReferenceNumber(ref);
-    setIsConfirmed(true);
-    console.log('Payment processed with reference:', ref);
+
+    // Send notification to Telegram
+    const specs = items.map(item => 
+      `${item.specs.ram}, ${item.specs.cpu}, ${item.specs.storage}`
+    ).join(' | ');
+
+    try {
+      await sendTelegramNotification({
+        orderRef: ref,
+        telegramUsername,
+        planName: items.map(item => item.name).join(', '),
+        amount: total,
+        specs
+      });
+
+      // Save order details to localStorage
+      const orderDetails = {
+        reference: ref,
+        items,
+        total,
+        telegramUsername,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem(`order_${ref}`, JSON.stringify(orderDetails));
+
+      // Clear cart and show confirmation
+      clearCart();
+      setIsConfirmed(true);
+    } catch (error) {
+      console.error('Error processing order:', error);
+      toast({
+        variant: "destructive",
+        description: "Error processing order. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isConfirmed) {
@@ -96,7 +217,10 @@ const Checkout = () => {
       <main className="min-h-screen bg-background pt-24">
         <Navbar />
         <div className="container mx-auto px-4 py-12">
-          <OrderConfirmation referenceNumber={referenceNumber} />
+          <OrderConfirmation 
+            referenceNumber={referenceNumber}
+            telegramUsername={telegramUsername}
+          />
         </div>
       </main>
     );
@@ -131,8 +255,8 @@ const Checkout = () => {
           
           <div className="space-y-6">
             <h2 className="text-2xl font-bold mb-6">Payment</h2>
-            <div className="glass-card p-6 text-center">
-              <h3 className="font-semibold mb-4">Scan to Pay with Binance</h3>
+            <div className="glass-card p-6">
+              <h3 className="font-semibold mb-4">1. Scan to Pay with Binance</h3>
               {qrCode && (
                 <img 
                   src={qrCode} 
@@ -140,12 +264,35 @@ const Checkout = () => {
                   className="mx-auto mb-6 w-48 h-48"
                 />
               )}
+
+              <div className="space-y-4 mb-6">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Your Telegram Username"
+                    value={telegramUsername}
+                    onChange={(e) => setTelegramUsername(e.target.value)}
+                    className="w-full px-4 py-2 bg-background border border-border rounded-md"
+                  />
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Payment Transaction ID"
+                    value={transactionId}
+                    onChange={(e) => setTransactionId(e.target.value)}
+                    className="w-full px-4 py-2 bg-background border border-border rounded-md"
+                  />
+                </div>
+              </div>
+
               <Button 
                 className="w-full" 
                 size="lg"
                 onClick={handleProceedToPayment}
+                disabled={isSubmitting}
               >
-                I've Made the Payment
+                {isSubmitting ? "Processing..." : "I've Made the Payment"}
               </Button>
             </div>
           </div>

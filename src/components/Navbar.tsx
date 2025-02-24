@@ -21,9 +21,8 @@ export const Navbar = () => {
 
   const navLinks = [
     { title: "Home", href: "/" },
-    { title: "Plans", href: "/plans" },
-    { title: "Features", href: "/features" },
     { title: "FAQ", href: "/faq" },
+    { title: "Contact", href: "/contact" },
   ];
 
   return (
@@ -33,7 +32,6 @@ export const Navbar = () => {
           GeoVFX RDP
         </Link>
 
-        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <Link
@@ -47,7 +45,6 @@ export const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-4">
-          <Button variant="ghost">Login</Button>
           <Link to="/checkout">
             <Button variant="outline" size="icon" className="relative">
               <ShoppingCart className="h-5 w-5" />
@@ -58,10 +55,8 @@ export const Navbar = () => {
               )}
             </Button>
           </Link>
-          <Button>Get Started</Button>
         </div>
 
-        {/* Mobile Navigation */}
         <Sheet>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon">
@@ -79,10 +74,6 @@ export const Navbar = () => {
                   {link.title}
                 </Link>
               ))}
-              <div className="flex flex-col gap-2 mt-4">
-                <Button variant="ghost" className="w-full">Login</Button>
-                <Button className="w-full">Get Started</Button>
-              </div>
             </div>
           </SheetContent>
         </Sheet>
