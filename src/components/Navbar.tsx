@@ -48,14 +48,16 @@ export const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-4">
           <Button variant="ghost">Login</Button>
-          <Button variant="outline" size="icon" className="relative">
-            <ShoppingCart className="h-5 w-5" />
-            {cartItems.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground w-5 h-5 rounded-full text-xs flex items-center justify-center">
-                {cartItems.length}
-              </span>
-            )}
-          </Button>
+          <Link to="/checkout">
+            <Button variant="outline" size="icon" className="relative">
+              <ShoppingCart className="h-5 w-5" />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground w-5 h-5 rounded-full text-xs flex items-center justify-center">
+                  {cartItems.length}
+                </span>
+              )}
+            </Button>
+          </Link>
           <Button>Get Started</Button>
         </div>
 
