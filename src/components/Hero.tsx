@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
 export const Hero = () => {
+  const handleViewPlans = () => {
+    const plansSection = document.getElementById('plans-section');
+    if (plansSection) {
+      plansSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
       <ParticleBg />
@@ -15,7 +22,7 @@ export const Hero = () => {
           High-performance remote desktop solutions with 24/7 uptime and full administrative control
         </p>
         <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-          <Button size="lg" className="text-lg px-8">
+          <Button size="lg" className="text-lg px-8" onClick={handleViewPlans}>
             View Plans
           </Button>
           <Button size="lg" variant="ghost" className="text-lg group">

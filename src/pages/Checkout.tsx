@@ -1,11 +1,10 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { useCartStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Copy, CheckCircle } from "lucide-react";
 import QRCode from "qrcode";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const OrderConfirmation = ({ referenceNumber }: { referenceNumber: string }) => {
   const { toast } = useToast();
@@ -54,24 +53,42 @@ const OrderConfirmation = ({ referenceNumber }: { referenceNumber: string }) => 
 
 const Checkout = () => {
   const items = useCartStore(state => state.items);
+  const getTotalPrice = useCartStore(state => state.getTotalPrice);
   const [qrCode, setQrCode] = useState<string>("");
   const [referenceNumber, setReferenceNumber] = useState<string>("");
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [total, setTotal] = useState(0);
 
-  const total = items.reduce((sum, item) => sum + item.price, 0);
+  useEffect(() => {
+    const storeTotal = getTotalPrice();
+    const calculatedTotal = items.reduce((sum, item) => {
+      const itemPrice = typeof item.price === 'string' 
+        ? parseFloat(item.price) 
+        : item.price;
+      return sum + (isNaN(itemPrice) ? 0 : itemPrice);
+    }, 0);
+    
+    const finalTotal = storeTotal > 0 ? storeTotal : calculatedTotal;
+    setTotal(finalTotal);
+    console.log('Cart total calculation:', { storeTotal, calculatedTotal, finalTotal });
+  }, [items, getTotalPrice]);
 
-  // Generate QR code on component mount
-  useState(() => {
-    QRCode.toDataURL(`binancepay:${289768760}?amount=${total}`)
-      .then(url => setQrCode(url))
-      .catch(err => console.error(err));
-  });
+  useEffect(() => {
+    if (total > 0) {
+      const orderRef = `GEO-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+      const paymentUrl = `binance://pay?recipient=289768760&amount=${total.toFixed(2)}&currency=USDT&memo=GeoVFX_Order_${orderRef}`;
+      
+      QRCode.toDataURL(paymentUrl)
+        .then(url => setQrCode(url))
+        .catch(err => console.error('QR Code generation error:', err));
+    }
+  }, [total]);
 
   const handleProceedToPayment = () => {
-    // Generate a unique reference number
     const ref = `GEO-${Date.now().toString(36).toUpperCase()}`;
     setReferenceNumber(ref);
     setIsConfirmed(true);
+    console.log('Payment processed with reference:', ref);
   };
 
   if (isConfirmed) {
@@ -90,7 +107,6 @@ const Checkout = () => {
       <Navbar />
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Order Summary */}
           <div className="space-y-6">
             <h1 className="text-2xl font-bold mb-6">Order Summary</h1>
             <div className="space-y-4">
@@ -100,7 +116,7 @@ const Checkout = () => {
                   <p className="text-muted-foreground">
                     {item.specs.ram} • {item.specs.cpu} • {item.specs.storage}
                   </p>
-                  <p className="text-right font-semibold">${item.price}</p>
+                  <p className="text-right font-semibold">${typeof item.price === 'number' ? item.price.toFixed(2) : '0.00'}</p>
                 </div>
               ))}
             </div>
@@ -113,7 +129,6 @@ const Checkout = () => {
             </div>
           </div>
           
-          {/* Payment Section */}
           <div className="space-y-6">
             <h2 className="text-2xl font-bold mb-6">Payment</h2>
             <div className="glass-card p-6 text-center">

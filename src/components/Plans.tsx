@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { useCartStore, type Plan } from "@/lib/store";
+import { useToast } from "@/hooks/use-toast";
 
 const plans: Plan[] = [
   {
@@ -59,9 +60,26 @@ const plans: Plan[] = [
 
 export const Plans = () => {
   const addToCart = useCartStore(state => state.addToCart);
+  const { toast } = useToast();
+
+  const handleAddToCart = (plan: Plan) => {
+    if (typeof plan.price !== 'number' || isNaN(plan.price)) {
+      console.error('Invalid price format:', plan.price);
+      toast({
+        variant: "destructive",
+        description: "Error adding plan to cart. Please try again.",
+      });
+      return;
+    }
+
+    addToCart(plan);
+    toast({
+      description: `${plan.name} added to cart successfully.`,
+    });
+  };
 
   return (
-    <section className="py-24 px-4 relative">
+    <section className="py-24 px-4 relative" id="plans-section">
       <div className="container mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold heading-gradient text-center mb-4">
           Choose Your Plan
@@ -92,7 +110,7 @@ export const Plans = () => {
                 
                 <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold">${plan.price}</span>
+                  <span className="text-4xl font-bold">${plan.price.toFixed(2)}</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
                 
@@ -121,7 +139,7 @@ export const Plans = () => {
                   className="w-full"
                   size="lg"
                   variant={isPopular ? "default" : "outline"}
-                  onClick={() => addToCart(plan)}
+                  onClick={() => handleAddToCart(plan)}
                 >
                   Add to Cart
                 </Button>
