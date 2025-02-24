@@ -8,32 +8,35 @@ const plans: Plan[] = [
   {
     id: "basic",
     name: "Basic RDP",
-    price: 29.99,
+    price: 10.00,
     specs: {
-      ram: "4GB RAM",
+      ram: "8GB RAM",
       cpu: "2 vCPU",
-      storage: "50GB SSD"
+      storage: "120GB Storage"
     },
     features: [
       "Root Access",
       "Basic Support",
       "99.5% Uptime",
-      "Automated Backups"
+      "Fixed Storage",
+      "Automated Backups",
+      "Single IP Address"
     ]
   },
   {
     id: "business",
     name: "Business RDP",
-    price: 59.99,
+    price: 15.00,
     specs: {
-      ram: "8GB RAM",
+      ram: "16GB RAM",
       cpu: "4 vCPU",
-      storage: "120GB SSD"
+      storage: "120GB Storage (upgradable to 350GB)"
     },
     features: [
       "Root Access",
       "Priority Support",
       "99.9% Uptime",
+      "Upgradable Storage",
       "Daily Backups",
       "Dedicated IP"
     ]
@@ -41,18 +44,19 @@ const plans: Plan[] = [
   {
     id: "premium",
     name: "Premium RDP",
-    price: 119.99,
+    price: 20.00,
     specs: {
-      ram: "16GB RAM",
+      ram: "32GB RAM",
       cpu: "8 vCPU",
-      storage: "250GB SSD"
+      storage: "120GB Storage (upgradable to 350GB)"
     },
     features: [
       "Root Access",
       "24/7 Dedicated Support",
       "99.99% Uptime",
+      "Upgradable Storage",
       "Hourly Backups",
-      "Dedicated IP",
+      "Multiple Dedicated IPs",
       "Load Balancing"
     ]
   }
@@ -134,6 +138,12 @@ export const Plans = () => {
                     ))}
                   </ul>
                 </div>
+
+                {plan.id !== "basic" && (
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Storage upgrades available (+$1/month per 50GB)
+                  </p>
+                )}
                 
                 <Button 
                   className="w-full"

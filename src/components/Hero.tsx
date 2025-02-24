@@ -2,8 +2,11 @@
 import { ParticleBg } from "./ParticleBg";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Hero = () => {
+  const navigate = useNavigate();
+  
   const handleViewPlans = () => {
     const plansSection = document.getElementById('plans-section');
     if (plansSection) {
@@ -25,7 +28,12 @@ export const Hero = () => {
           <Button size="lg" className="text-lg px-8" onClick={handleViewPlans}>
             View Plans
           </Button>
-          <Button size="lg" variant="ghost" className="text-lg group">
+          <Button 
+            size="lg" 
+            variant="ghost" 
+            className="text-lg group"
+            onClick={() => navigate('/faq')}
+          >
             Learn More
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Button>
