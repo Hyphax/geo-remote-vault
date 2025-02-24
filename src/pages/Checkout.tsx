@@ -19,7 +19,7 @@ const sendTelegramNotification = async (orderDetails: {
   const chatId = '1264599494';
   
   const message = `
-🔔 *New GeoVFX RDP Order*
+🔔 *New Cudo RDP Order*
 ───────────────
 📋 *Order Ref:* ${orderDetails.orderRef}
 👤 *Customer:* ${orderDetails.telegramUsername || 'Not provided'}

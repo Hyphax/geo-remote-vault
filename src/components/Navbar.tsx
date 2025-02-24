@@ -28,7 +28,7 @@ export const Navbar = () => {
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "glass py-4" : "py-6"}`}>
       <nav className="container mx-auto flex items-center justify-between px-4">
         <Link to="/" className="text-2xl font-bold text-gradient-primary">
-          GeoVFX RDP
+          Cudo RDP
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
