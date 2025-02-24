@@ -30,13 +30,13 @@ const plans: Plan[] = [
     specs: {
       ram: "16GB RAM",
       cpu: "4 vCPU",
-      storage: "120GB Storage (upgradable to 350GB)"
+      storage: "120GB Storage"
     },
     features: [
       "Root Access",
       "Priority Support",
       "99.9% Uptime",
-      "Upgradable Storage",
+      "Upgradable Storage (+50GB for $1/mo)",
       "Daily Backups",
       "Dedicated IP"
     ]
@@ -48,13 +48,13 @@ const plans: Plan[] = [
     specs: {
       ram: "32GB RAM",
       cpu: "8 vCPU",
-      storage: "120GB Storage (upgradable to 350GB)"
+      storage: "120GB Storage"
     },
     features: [
       "Root Access",
       "24/7 Dedicated Support",
       "99.99% Uptime",
-      "Upgradable Storage",
+      "Upgradable Storage (+50GB for $1/mo)",
       "Hourly Backups",
       "Multiple Dedicated IPs",
       "Load Balancing"
