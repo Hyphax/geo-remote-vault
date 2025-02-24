@@ -99,7 +99,7 @@ export const Plans = () => {
             return (
               <div
                 key={plan.id}
-                className={`glass-card p-8 relative ${
+                className={`glass-card p-6 md:p-8 relative z-10 ${
                   isPopular ? "border-primary ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
                 }`}
                 style={{
@@ -107,32 +107,35 @@ export const Plans = () => {
                 }}
               >
                 {isPopular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap">
                     Most Popular
                   </div>
                 )}
                 
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                <h3 className="text-xl md:text-2xl font-bold mb-2">{plan.name}</h3>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold">${plan.price.toFixed(2)}</span>
+                  <span className="text-3xl md:text-4xl font-bold">${plan.price.toFixed(2)}</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
                 
                 <div className="space-y-4 mb-6">
                   <p className="text-lg font-semibold">Specifications:</p>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>{plan.specs.ram}</li>
-                    <li>{plan.specs.cpu}</li>
-                    <li>{plan.specs.storage}</li>
+                    <li className="text-base md:text-sm">{plan.specs.ram}</li>
+                    <li className="text-base md:text-sm">{plan.specs.cpu}</li>
+                    <li className="text-base md:text-sm">{plan.specs.storage}</li>
                   </ul>
                 </div>
                 
                 <div className="space-y-4 mb-8">
                   <p className="text-lg font-semibold">Features:</p>
-                  <ul className="space-y-2">
+                  <ul className="space-y-3 md:space-y-2">
                     {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2 text-muted-foreground">
-                        <Check className="h-4 w-4 text-primary shrink-0" />
+                      <li 
+                        key={feature} 
+                        className="flex items-center gap-2 text-muted-foreground text-base md:text-sm"
+                      >
+                        <Check className="h-5 w-5 md:h-4 md:w-4 text-primary shrink-0" />
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -140,13 +143,13 @@ export const Plans = () => {
                 </div>
 
                 {plan.id !== "basic" && (
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-base md:text-sm text-muted-foreground mb-4">
                     Storage upgrades available (+$1/month per 50GB)
                   </p>
                 )}
                 
                 <Button 
-                  className="w-full"
+                  className="w-full min-h-[44px] text-base touch-manipulation"
                   size="lg"
                   variant={isPopular ? "default" : "outline"}
                   onClick={() => handleAddToCart(plan)}

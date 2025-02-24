@@ -32,7 +32,11 @@ export function CartPreview() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="relative">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="relative min-h-[44px] min-w-[44px] touch-manipulation"
+        >
           <ShoppingCart className="h-5 w-5" />
           {items.length > 0 && (
             <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground w-5 h-5 rounded-full text-xs flex items-center justify-center">
@@ -49,15 +53,18 @@ export function CartPreview() {
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-4 py-8">
               <p className="text-muted-foreground">Your cart is empty</p>
-              <Link to="/">
-                <Button onClick={() => {
-                  const plansSection = document.getElementById('plans-section');
-                  if (plansSection) {
-                    setTimeout(() => {
-                      plansSection.scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
-                  }
-                }}>
+              <Link to="/" className="w-full max-w-[200px]">
+                <Button 
+                  className="w-full min-h-[44px]" 
+                  onClick={() => {
+                    const plansSection = document.getElementById('plans-section');
+                    if (plansSection) {
+                      setTimeout(() => {
+                        plansSection.scrollIntoView({ behavior: 'smooth' });
+                      }, 100);
+                    }
+                  }}
+                >
                   Continue Shopping
                 </Button>
               </Link>
@@ -80,7 +87,7 @@ export function CartPreview() {
                       <Button
                         variant="outline"
                         size="icon"
-                        className="h-8 w-8"
+                        className="h-10 w-10 min-h-[44px] min-w-[44px] touch-manipulation"
                         onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                       >
                         <Minus className="h-4 w-4" />
@@ -89,7 +96,7 @@ export function CartPreview() {
                       <Button
                         variant="outline"
                         size="icon"
-                        className="h-8 w-8"
+                        className="h-10 w-10 min-h-[44px] min-w-[44px] touch-manipulation"
                         onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                       >
                         <Plus className="h-4 w-4" />
@@ -103,7 +110,7 @@ export function CartPreview() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 mt-2"
+                      className="h-10 w-10 min-h-[44px] min-w-[44px] mt-2 touch-manipulation"
                       onClick={() => handleRemoveItem(item.id)}
                     >
                       <X className="h-4 w-4" />
@@ -116,8 +123,8 @@ export function CartPreview() {
                   <span>Total</span>
                   <span className="font-bold">${getTotalPrice().toFixed(2)}</span>
                 </div>
-                <Link to="/checkout">
-                  <Button className="w-full">
+                <Link to="/checkout" className="block w-full">
+                  <Button className="w-full min-h-[44px]">
                     Proceed to Checkout
                   </Button>
                 </Link>
