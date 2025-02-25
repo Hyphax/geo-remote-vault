@@ -3,7 +3,6 @@ import { Navbar } from "@/components/Navbar";
 import { useCartStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Copy, CheckCircle, Clock, MessageSquare } from "lucide-react";
-import QRCode from "qrcode";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 
@@ -156,17 +155,6 @@ const Checkout = () => {
     });
   };
 
-  useEffect(() => {
-    if (total > 0) {
-      const orderRef = `GEO-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
-      const paymentUrl = `binance://pay?recipient=289768760&amount=${total.toFixed(2)}&currency=USDT&memo=GeoVFX_Order_${orderRef}`;
-      
-      QRCode.toDataURL(paymentUrl)
-        .then(url => setQrCode(url))
-        .catch(err => console.error('QR Code generation error:', err));
-    }
-  }, [total]);
-
   const handleProceedToPayment = async () => {
     if (!telegramUsername || !transactionId) {
       toast({
@@ -180,7 +168,6 @@ const Checkout = () => {
     const ref = `GEO-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
     setReferenceNumber(ref);
 
-    // Send notification to Telegram
     const specs = items.map(item => 
       `${item.specs.ram}, ${item.specs.cpu}, ${item.specs.storage}`
     ).join(' | ');
@@ -194,7 +181,6 @@ const Checkout = () => {
         specs
       });
 
-      // Save order details to localStorage
       const orderDetails = {
         reference: ref,
         items,
@@ -204,7 +190,6 @@ const Checkout = () => {
       };
       localStorage.setItem(`order_${ref}`, JSON.stringify(orderDetails));
 
-      // Clear cart and show confirmation
       clearCart();
       setIsConfirmed(true);
     } catch (error) {
