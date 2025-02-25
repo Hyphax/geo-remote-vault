@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { useCartStore } from "@/lib/store";
@@ -127,7 +126,6 @@ const Checkout = () => {
   const items = useCartStore(state => state.items);
   const getTotalPrice = useCartStore(state => state.getTotalPrice);
   const clearCart = useCartStore(state => state.clearCart);
-  const [qrCode, setQrCode] = useState<string>("");
   const [referenceNumber, setReferenceNumber] = useState<string>("");
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [total, setTotal] = useState(0);
@@ -135,6 +133,7 @@ const Checkout = () => {
   const [transactionId, setTransactionId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const binancePayId = "289768760";
 
   useEffect(() => {
     const storeTotal = getTotalPrice();
@@ -149,6 +148,13 @@ const Checkout = () => {
     setTotal(finalTotal);
     console.log('Cart total calculation:', { storeTotal, calculatedTotal, finalTotal });
   }, [items, getTotalPrice]);
+
+  const copyBinanceId = () => {
+    navigator.clipboard.writeText(binancePayId);
+    toast({
+      description: "Binance Pay ID copied to clipboard",
+    });
+  };
 
   useEffect(() => {
     if (total > 0) {
@@ -257,13 +263,25 @@ const Checkout = () => {
             <h2 className="text-2xl font-bold mb-6">Payment</h2>
             <div className="glass-card p-6">
               <h3 className="font-semibold mb-4">1. Scan to Pay with Binance</h3>
-              {qrCode && (
+              <div className="text-center mb-4">
                 <img 
-                  src={qrCode} 
-                  alt="Payment QR Code" 
-                  className="mx-auto mb-6 w-48 h-48"
+                  src="/lovable-uploads/e282f8d7-2b74-490a-b638-f3407e9d51ab.png" 
+                  alt="Binance Pay QR Code" 
+                  className="mx-auto mb-4 w-48 h-48"
                 />
-              )}
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className="text-muted-foreground">Binance Pay ID:</span>
+                  <code className="bg-muted px-2 py-1 rounded">{binancePayId}</code>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={copyBinanceId}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
 
               <div className="space-y-4 mb-6">
                 <div className="relative">
